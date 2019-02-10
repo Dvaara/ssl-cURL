@@ -17,6 +17,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+/**
+ * Support client credentials call via MTLS and introspect call.
+ */
 public class Main {
 
     public Main() {
@@ -26,18 +29,26 @@ public class Main {
     public static void main(String... args) {
 
         String url = args[0];
+        String data = args[1];
         CloseableHttpClient httpClient = HttpClients.custom().useSystemProperties().setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
 //        HttpGet get = new HttpGet(url);
 //        String response = makeCall(httpClient, get);
 //        System.out.println(response);
 //        System.exit(1);
 
+//        curl -v -k -u  admin:admin -H 'Content-Type: application/x-www-form-urlencoded'
+//                -X POST --data 'token=f19dbc8a-1511-3501-a838-6640fc90bea2' https://localhost:9443/oauth2/introspect
+
         HttpPost post = new HttpPost(url);
         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-        nameValuePairs.add(new BasicNameValuePair("grant_type", "client_credentials"));
+        String[] pair = data.split("=");
+        nameValuePairs.add(new BasicNameValuePair(pair[0], pair[1]));
         try {
             post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             post.setHeader("Content-Type","application/x-www-form-urlencoded");
+            if(data.contains("token=")) {
+                post.setHeader("Resource", "/finance/salary");
+            }
             String response = makeCall(httpClient, post);
             System.out.println(response);
             System.exit(1);
