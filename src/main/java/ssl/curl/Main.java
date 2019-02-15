@@ -43,9 +43,11 @@ public class Main {
         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
         String[] pair = data.split("=");
         nameValuePairs.add(new BasicNameValuePair(pair[0], pair[1]));
+        nameValuePairs.add(new BasicNameValuePair("scope","clearance1 clearance2"));
         try {
             post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             post.setHeader("Content-Type","application/x-www-form-urlencoded");
+            post.setHeader("Method","POST");
             if(data.contains("token=")) {
                 post.setHeader("Resource", "/finance/salary");
             }
